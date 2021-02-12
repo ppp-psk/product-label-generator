@@ -53,7 +53,7 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
     
     cells  = table.rows[rowIndex].cells
 
-    p = cells[columnIndex].add_paragraph('(โหลที่)')
+    p = cells[columnIndex].add_paragraph('(ลำดับที่)')
     p.add_run(' ' + number).bold = True
     settings.append(p)
 
