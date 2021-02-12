@@ -1,19 +1,24 @@
 #Version 1.1 Date Feb 12, 2021
+# - Read data from .xlsx and output .docx
 
-import sys
-import datetime
-import time
-from docx import Document
-from docx.shared import Length
-from docx.shared import Pt
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-import pandas as pd
+import sys #For exit program
+import datetime #Create output file name
+import time #Program sleep function
+from docx import Document #Create .docx file
+from docx.shared import Length #doc layout
+from docx.shared import Pt #doc layout
+from docx.enum.text import WD_ALIGN_PARAGRAPH #doc layout
+import pandas as pd #Datatable processing
 
-global cellPointer  #There are four cell per page
-global table 
+#CHANGE INPUT FILE HERE
+inputFilename = "product_input.xlsx"
+
+global cellPointer  #There are four cell per page (use in writeProductDataToTable)
+global table #Temporary variable for current avaliable table (use in writeProductDataToTable)
 table = None
 cellPointer = 0
 
+#Convert quantity count into โหล and ชิ้น
 def generateQuantityString(quantity):
     dozen = int(quantity/12)
     remaining = quantity%12
@@ -26,6 +31,7 @@ def generateQuantityString(quantity):
     
     return resultString
 
+#Insert product label into cells in tables
 def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , modelQuantity):
     global cellPointer
     global table
@@ -35,10 +41,12 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
     size = str(modelSize)
     quantityString = generateQuantityString(modelQuantity)
     
+	#Add new table into blank page
     if(cellPointer % 4 == 0):
         table = document.add_table(rows=2, cols=2)
         cellPointer = 0
     
+	#a List of component for one time setting 
     settings = list()
     rowIndex = int(cellPointer/2) 
     columnIndex = cellPointer % 2
@@ -69,12 +77,13 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
         text.alignment  = WD_ALIGN_PARAGRAPH.CENTER
     
     cellPointer = cellPointer + 1
-        
+    
+	#Move to new page, when table in current page is full
     if(cellPointer == 4):
         document.add_page_break()
 
 try:
-	product_data = pd.read_excel("product_input.xlsx")
+	product_data = pd.read_excel(inputFilename)
 
 	try:
 		document = Document()
@@ -88,6 +97,7 @@ try:
 		productRowCount = product_data.shape[0]
 		productSizeCount = product_data.shape[1] - startColumnSize
 
+		#Each size in each model
 		for i in range(productRowCount):
 			productModelName = product_data['model'][i]
 			productModelColor = product_data['color'][i]
@@ -112,11 +122,13 @@ try:
 		timeNow = datetime.datetime.now()
 		document.save( str(timeNow.year)+ str(timeNow.month) + str(timeNow.day)+ '_' + str(timeNow.hour) + "-" + str(timeNow.minute)+ "-" + str(timeNow.second)+ '.docx')
 	except  Exception as e:
+		#Error for internal code
 		print("[Error] Please check following error")
 		print(e)
 		time.sleep(10)
 except:
-	print("[Error] Cannot open product_input.xlsx")
+	#Error for O/I file exception
+	print("[Error] Cannot open " + inputFilename)
 	time.sleep(10)
 
 
