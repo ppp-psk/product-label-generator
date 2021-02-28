@@ -1,4 +1,4 @@
-#Version 1.1 Date Feb 12, 2021
+#Version 1.2 Date Feb 28, 2021
 # - Read data from .xlsx and output .docx
 
 import sys #For exit program
@@ -7,6 +7,7 @@ import time #Program sleep function
 from docx import Document #Create .docx file
 from docx.shared import Length #doc layout
 from docx.shared import Pt #doc layout
+from docx.shared import Mm #doc layout
 from docx.enum.text import WD_ALIGN_PARAGRAPH #doc layout
 import pandas as pd #Datatable processing
 
@@ -21,7 +22,7 @@ cellPointer = 0
 #Convert quantity count into โหล and ชิ้น
 def generateQuantityString(quantity):
     dozen = int(quantity/12)
-    remaining = quantity%12
+    remaining = int(quantity%12)
     resultString = ""
     if dozen > 0:
         resultString = str(dozen) + " โหล"
@@ -43,6 +44,9 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
     
 	#Add new table into blank page
     if(cellPointer % 4 == 0):
+		#Move to new page, when table in current page is full
+        if(table != None):
+            document.add_page_break()
         table = document.add_table(rows=2, cols=2)
         cellPointer = 0
     
@@ -57,9 +61,14 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
     p.add_run(' ' + number).bold = True
     settings.append(p)
 
-    p = cells[columnIndex].add_paragraph('(รุ่น)')
-    p.add_run(' ' + model).bold = True
-    settings.append(p)
+    if(len(model) < 10):
+        p = cells[columnIndex].add_paragraph('(รุ่น)')
+        p.add_run(' ' + model).bold = True
+        settings.append(p)
+    else:
+        p = cells[columnIndex].add_paragraph()
+        p.add_run(' ' + model).bold = True
+        settings.append(p)
 
     p = cells[columnIndex].add_paragraph('(สี)')
     p.add_run(' ' + color).bold = True
@@ -78,15 +87,24 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
     
     cellPointer = cellPointer + 1
     
-	#Move to new page, when table in current page is full
-    if(cellPointer == 4):
-        document.add_page_break()
+	
+
 
 try:
 	product_data = pd.read_excel(inputFilename)
 
 	try:
 		document = Document()
+
+		section = document.sections[0]
+
+		section.page_height = Mm(210)
+		section.page_width = Mm(120)
+		section.left_margin = Mm(13)
+		section.right_margin = Mm(10)
+		section.top_margin = Mm(10)
+		section.bottom_margin = Mm(10)
+
 		style = document.styles['Normal']
 		font = style.font
 		font.name = 'TH Sarabun New'
