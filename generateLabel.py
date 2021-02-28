@@ -90,7 +90,7 @@ try:
 		style = document.styles['Normal']
 		font = style.font
 		font.name = 'TH Sarabun New'
-		font.size = Pt(24)
+		font.size = Pt(20)
 
 		columnList = product_data.columns.tolist()
 		startColumnSize = 2
