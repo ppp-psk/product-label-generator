@@ -1,4 +1,4 @@
-#Version 1.2 Date Feb 28, 2021
+#Version 1.4 Date Jul 24, 2022
 # - Read data from .xlsx and output .docx
 
 import sys #For exit program
@@ -19,7 +19,7 @@ global table #Temporary variable for current avaliable table (use in writeProduc
 table = None
 cellPointer = 0
 
-#Convert quantity count into โหล and ชิ้น
+#Convert quantity count into โหล and ตัว
 def generateQuantityString(quantity):
     dozen = int(quantity/12)
     remaining = int(quantity%12)
@@ -27,8 +27,8 @@ def generateQuantityString(quantity):
     if dozen > 0:
         resultString = str(dozen) + " โหล"
     
-    if remaining > 0:
-        resultString = resultString + " " + str(remaining) + " ชิ้น"
+    if remaining > 0: 
+        resultString = resultString + " " + str(remaining) + " ตัว"
     
     return resultString
 
@@ -57,12 +57,12 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
     
     cells  = table.rows[rowIndex].cells
 
-    p = cells[columnIndex].add_paragraph('(ลำดับที่)')
+    p = cells[columnIndex].add_paragraph('โหลที่')
     p.add_run(' ' + number).bold = True
     settings.append(p)
 
     if(len(model) < 10):
-        p = cells[columnIndex].add_paragraph('(รุ่น)')
+        p = cells[columnIndex].add_paragraph('รุ่น')
         p.add_run(' ' + model).bold = True
         settings.append(p)
     else:
@@ -70,15 +70,15 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
         p.add_run(' ' + model).bold = True
         settings.append(p)
 
-    p = cells[columnIndex].add_paragraph('(สี)')
+    p = cells[columnIndex].add_paragraph('สี')
     p.add_run(' ' + color).bold = True
     settings.append(p)
 
-    p = cells[columnIndex].add_paragraph('(ขนาด)')
+    p = cells[columnIndex].add_paragraph('ขนาด')
     p.add_run(' ' + size).bold = True
     settings.append(p)
 
-    p = cells[columnIndex].add_paragraph('(จำนวน)')
+    p = cells[columnIndex].add_paragraph('จำนวน')
     p.add_run(' ' + quantityString).bold = True
     settings.append(p)       
 
@@ -87,11 +87,9 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
     
     cellPointer = cellPointer + 1
     
-	
-
 
 try:
-	product_data = pd.read_excel(inputFilename)
+	product_data = pd.read_excel(inputFilename,dtype={'model':str})
 
 	try:
 		document = Document()
@@ -148,11 +146,3 @@ except:
 	#Error for O/I file exception
 	print("[Error] Cannot open " + inputFilename)
 	time.sleep(10)
-
-
-
-
-
-
-
-
