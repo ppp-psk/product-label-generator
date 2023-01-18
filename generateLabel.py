@@ -37,8 +37,8 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
     global cellPointer
     global table
     number = str(dozenCount)
-    model = modelName
-    color = modelColor
+    model = str(modelName)
+    color = str(modelColor)
     size = str(modelSize)
     quantityString = generateQuantityString(modelQuantity)
     
@@ -70,9 +70,10 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
         p.add_run(' ' + model).bold = True
         settings.append(p)
 
-    p = cells[columnIndex].add_paragraph('สี')
-    p.add_run(' ' + color).bold = True
-    settings.append(p)
+    if (color != "nan"):
+        p = cells[columnIndex].add_paragraph('สี')
+        p.add_run(' ' + color).bold = True
+        settings.append(p)
 
     p = cells[columnIndex].add_paragraph('ขนาด')
     p.add_run(' ' + size).bold = True
@@ -89,6 +90,7 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
     
 
 try:
+	print("reading " + inputFilename)
 	product_data = pd.read_excel(inputFilename,dtype={'model':str})
 
 	try:
@@ -113,6 +115,8 @@ try:
 		productRowCount = product_data.shape[0]
 		productSizeCount = product_data.shape[1] - startColumnSize
 
+		print("generating label size count=" + str(productSizeCount))
+
 		#Each size in each model
 		for i in range(productRowCount):
 			productModelName = product_data['model'][i]
@@ -121,6 +125,9 @@ try:
 				productModelSize = product_data.columns[(startColumnSize ) + j]
 				currentProductSizeCount = product_data[productModelSize][i]
 				dozenCount = 1
+				
+				print("generate model=" + str(productModelName) + " color=" + str(productModelColor) +" size=" + str(productModelSize) )
+
 				while (currentProductSizeCount > 0):
 					if(currentProductSizeCount > 12 and currentProductSizeCount < 18):
 						writeProductDataToTable(dozenCount, productModelName, productModelColor, productModelSize , currentProductSizeCount)
