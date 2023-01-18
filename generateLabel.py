@@ -102,7 +102,8 @@ def writeProductDataToTable(dozenCount, modelName, modelColor, modelSize , model
     
 
 try:
-	print("reading " + inputFilename)
+    print("reading " + inputFilename)
+
     product_data = pd.read_excel(inputFilename,dtype={'model':str})
 
     try:
@@ -114,7 +115,7 @@ try:
         section.page_width = Mm(120)
         section.left_margin = Mm(13)
         section.right_margin = Mm(10)
-        section.top_margin = Mm(12)
+        section.top_margin = Mm(10)
         section.bottom_margin = Mm(0)
 
         style = document.styles['Normal']
@@ -127,7 +128,7 @@ try:
         productRowCount = product_data.shape[0]
         productSizeCount = product_data.shape[1] - startColumnSize
 
-		print("generating label size count=" + str(productSizeCount))
+        print("generating label size count=" + str(productSizeCount))
 
         #Each size in each model
         for i in range(productRowCount):
@@ -138,7 +139,7 @@ try:
                 currentProductSizeCount = product_data[productModelSize][i]
                 dozenCount = 1
 				
-				print("generate model=" + str(productModelName) + " color=" + str(productModelColor) +" size=" + str(productModelSize) )
+                print("generate model=" + str(productModelName) + " color=" + str(productModelColor) +" size=" + str(productModelSize) )
 
                 while (currentProductSizeCount > 0):
                     if(currentProductSizeCount > 12 and currentProductSizeCount < 18):
